@@ -68,7 +68,7 @@ class filho(object):
                                color=blue,\
                                pos = \"" + str(x.cord1) + "," +
                                                           str(x.cord2) +
-                                                          "!\"];")
+                                                          "!\"];\n")
         for x in range(1, len(self.vertices)):
             custo = self.vertices[x-1].distancia(self.vertices[x])
             f.write(self.vertices[x - 1].label +
@@ -76,13 +76,13 @@ class filho(object):
             f.write("[penwidth=12,label=\"" +
                     str(custo) +
                     "\",weight=\"" +
-                    str(custo) + "\"];")
+                    str(custo) + "\"];\n")
         custo = self.vertices[1].distancia(self.vertices[0])
         f.write(self.vertices[-1].label + " -> " + self.vertices[0].label)
         f.write("[penwidth=12,label=\"" +
                 str(custo) +
                 "\",weight=\"" +
-                str(custo) + "\"];")
+                str(custo) + "\"];\n")
         f.write("}")
 
 
