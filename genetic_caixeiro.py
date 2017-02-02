@@ -3,8 +3,8 @@
 from random import *
 from math import hypot
 import sys
-
 custos = {}
+
 
 class filho(object):
     """docstring for fiho."""
@@ -16,23 +16,12 @@ class filho(object):
         self.bestImprovement()
 
     def bestImprovement(self):
-        # solucao = self.vertices
-        # melhoria = True
-        # while melhoria:
-        #     melhoria = False
-        # fmin = self.custo
         for v in opt2(self.vertices):
             f = custo(v)
-            # if f < fmin:
             if f < self.custo:
-                # solucao = v
-                # fmin = f
-        # if fmin < self.custo:
-                # self.vertices = solucao
                 self.vertices = v
                 self.custo = f
                 break
-            # melhoria = True
 
     def mutation(self, chance):
         for i in range(5):
@@ -176,7 +165,6 @@ def genetico():
     MelhorAnt = 0
     j = 0
     while True:
-    # while (i < int(sys.argv[1])):
         i += 1
         populacao.sort(key=lambda x: x.custo)
         populacao = populacao[0].crossover(populacao[1:5][randint(0, 3)])
