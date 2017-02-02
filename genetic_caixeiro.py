@@ -138,8 +138,8 @@ class vertice(object):
 
 
 def ler_mapa():
-    if len(sys.argv) > 2:
-        arqIn = open(sys.argv[2])
+    if len(sys.argv) > 3:
+        arqIn = open(sys.argv[3])
     else:
         arqIn = sys.stdin
     num_vertices = int(arqIn.readline())
