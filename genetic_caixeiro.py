@@ -155,6 +155,10 @@ def ler_mapa():
 
 
 def genetico():
+    if len(sys.argv) > 1:
+        persiste = int(sys.argv[1])
+    else:
+        persiste = 5
     vertices = ler_mapa()
     populacao = []
     i = 0
@@ -172,12 +176,13 @@ def genetico():
             print "Iteracao " + str(i) + " :" + str(populacao[0].custo)
             if MelhorAnt - populacao[0].custo == 0:
                 j += 1
-                if j == 5:
+                if j == persiste:
                     break
             else:
                 j = 0
                 MelhorAnt = populacao[0].custo
-    populacao[0].to_dot_file("teste.dot")
+    if len(sys.argv) > 2:
+        populacao[0].to_dot_file(sys.argv[2])
     print "Melhor solucao: " + str(populacao[0].custo)
 
 
