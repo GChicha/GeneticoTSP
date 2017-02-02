@@ -13,9 +13,9 @@ class filho(object):
         self.vertices = vertices
         self.mutation(20)
         self.custo = self.__custo()
-        self.bestImprovement()
+        self.firstImprovement()
 
-    def bestImprovement(self):
+    def firstImprovement(self):
         for v in opt2(self.vertices):
             f = custo(v)
             if f < self.custo:
