@@ -1,17 +1,19 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from random import *
 from math import hypot
 import sys
+import argparse
 custos = {}
-
+parsed = ()
 
 class filho(object):
     """docstring for fiho."""
     def __init__(self, vertices):
         super(filho, self).__init__()
         self.vertices = vertices
-        self.mutation(20)
+        self.mutation(parsed.mutation_rate)
         self.custo = self.__custo()
         self.firstImprovement()
 
@@ -33,17 +35,19 @@ class filho(object):
                 self.vertices[y] = temp
 
     def __custo(self):
+        global custos
         custo = custos.get(tuple(self.vertices))
         if custo is None:
             custo = 0
             for x in range(len(self.vertices)):
                 custo += self.vertices[x-1].distancia(self.vertices[x])
+            custos[tuple(self.vertices)] = custos
         return custo
 
     def crossover(self, filho2):
         populacao = [self, filho2]
         tam = len(self.vertices)
-        while len(populacao) < 15:
+        while len(populacao) < parsed.populacao:
             vertices = []
             inicio = randint(0, len(self.vertices))
             fim = randint(inicio, len(self.vertices))
@@ -114,11 +118,13 @@ class opt2(object):
 
 
 def custo(vertices):
+    global custos
     custo = custos.get(tuple(vertices))
     if custo is None:
         custo = 0
         for x in range(len(vertices)):
             custo += vertices[x-1].distancia(vertices[x])
+        custos[tuple(vertices)] = custos
     return custo
 
 
@@ -138,10 +144,7 @@ class vertice(object):
 
 
 def ler_mapa():
-    if len(sys.argv) > 3:
-        arqIn = open(sys.argv[3])
-    else:
-        arqIn = sys.stdin
+    arqIn = parsed.INPUT
     num_vertices = int(arqIn.readline())
     vertices = []
     for i in range(num_vertices):
@@ -155,14 +158,10 @@ def ler_mapa():
 
 
 def genetico():
-    if len(sys.argv) > 1:
-        persiste = int(sys.argv[1])
-    else:
-        persiste = 5
     vertices = ler_mapa()
     populacao = []
     i = 0
-    while len(populacao) < 15:
+    while len(populacao) < parsed.populacao:
         cp = vertices[:]
         shuffle(cp)
         populacao.append(filho(cp))
@@ -172,19 +171,45 @@ def genetico():
         i += 1
         populacao.sort(key=lambda x: x.custo)
         populacao = populacao[0].crossover(populacao[1:5][randint(0, 3)])
-        if i % 100 == 0:
+        if i % parsed.step_size == 0:
             print "Iteracao " + str(i) + " :" + str(populacao[0].custo)
             if MelhorAnt - populacao[0].custo == 0:
                 j += 1
-                if j == persiste:
+                if j == parsed.geracoes:
                     break
             else:
                 j = 0
                 MelhorAnt = populacao[0].custo
-    if len(sys.argv) > 2:
-        populacao[0].to_dot_file(sys.argv[2])
+    if parsed.dot is not None:
+        populacao[0].to_dot_file(parsed.dot)
     print "Melhor solucao: " + str(populacao[0].custo)
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Genetico TSP")
+    parser.add_argument('-d', '--dot', metavar="Nome do aruvivo dot",
+                        action="store",
+                        help="Se especificado escreve\
+                        um arquivo dot")
+    parser.add_argument('--csv', action="store_true",
+                        help="Saida stdout em CSV")
+    parser.add_argument('-g', '--geracoes', metavar="Quantidade",
+                        action="store", default=5, type=int,
+                        help="Especifica o numero de gerações igauis até\
+                        desistir")
+    parser.add_argument('-p', '--populacao', metavar="Quantidade",
+                        action="store", default=10, type=int,
+                        help="Tamanho da populacão")
+    parser.add_argument('-m', '--mutation-rate', metavar='Porcentagem',
+                        action="store", default=20, type=int,
+                        help="Porcentagem da probabilidade de ocorrer\
+                        mutação")
+    parser.add_argument('-s', '--step-size', metavar="Quantidade",
+                        action="store", type=int, default=100,
+                        help="Tamanho do passo da saida")
+    parser.add_argument('INPUT', metavar="Arquivo de Entrada",
+                        action="store", type=file,
+                        help="Nome do arquivo de entrada, se não\
+                        especificado será tomada a entrada STDIN")
+    parsed = parser.parse_args(sys.argv[1:])
     genetico()
