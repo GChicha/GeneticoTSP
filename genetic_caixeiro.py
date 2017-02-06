@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from random import *
@@ -8,8 +8,8 @@ import argparse
 custos = {}
 parsed = ()
 
+
 class filho(object):
-    """docstring for fiho."""
     def __init__(self, vertices):
         super(filho, self).__init__()
         self.vertices = vertices
@@ -41,7 +41,7 @@ class filho(object):
             custo = 0
             for x in range(len(self.vertices)):
                 custo += self.vertices[x-1].distancia(self.vertices[x])
-            custos[tuple(self.vertices)] = custos
+            custos[tuple(self.vertices)] = custo
         return custo
 
     def crossover(self, filho2):
@@ -61,8 +61,8 @@ class filho(object):
             populacao.append(filho(vertices))
         return populacao
 
-    def to_dot_file(self, arquivo):
-        f = open(arquivo, "w")
+    def to_dot_file(self):
+        f = parsed.dot
         f.write("digraph {")
         for x in self.vertices:
             f.write(x.label + "[sfixedsize=true,\
@@ -102,7 +102,7 @@ class opt2(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.i > self.tam - 1:
             raise StopIteration()
         f = self.vertices[:self.i]
@@ -119,13 +119,12 @@ class opt2(object):
 
 def custo(vertices):
     global custos
-    custo = custos.get(tuple(vertices))
-    if custo is None:
+    if tuple(vertices) not in custos:
         custo = 0
         for x in range(len(vertices)):
             custo += vertices[x-1].distancia(vertices[x])
-        custos[tuple(vertices)] = custos
-    return custo
+        custos[tuple(vertices)] = custo
+    return custos[tuple(vertices)]
 
 
 class vertice(object):
@@ -137,14 +136,14 @@ class vertice(object):
         self.distancias = {}
 
     def distancia(self, vertice2):
-        if self.distancias.get(vertice2) is None:
+        if vertice2 not in self.distancias:
             self.distancias[vertice2] = hypot(self.cord1 - vertice2.cord1,
                                               self.cord2 - vertice2.cord2)
-        return self.distancias.get(vertice2)
+        return self.distancias[vertice2]
 
 
 def ler_mapa():
-    arqIn = parsed.INPUT
+    arqIn = parsed.input
     num_vertices = int(arqIn.readline())
     vertices = []
     for i in range(num_vertices):
@@ -171,8 +170,8 @@ def genetico():
         i += 1
         populacao.sort(key=lambda x: x.custo)
         populacao = populacao[0].crossover(populacao[1:5][randint(0, 3)])
-        if i % parsed.step_size == 0:
-            print "Iteracao " + str(i) + " :" + str(populacao[0].custo)
+        if i % parsed.step_size == 0 and parsed.debug:
+            print ("Iteracao " + str(i) + " :" + str(populacao[0].custo))
             if MelhorAnt - populacao[0].custo == 0:
                 j += 1
                 if j == parsed.geracoes:
@@ -181,35 +180,38 @@ def genetico():
                 j = 0
                 MelhorAnt = populacao[0].custo
     if parsed.dot is not None:
-        populacao[0].to_dot_file(parsed.dot)
-    print "Melhor solucao: " + str(populacao[0].custo)
+        populacao[0].to_dot_file()
+    print (str(populacao[0].custo))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Genetico TSP")
     parser.add_argument('-d', '--dot', metavar="Nome do aruvivo dot",
-                        action="store",
+                        action="store", type=argparse.FileType('w'),
                         help="Se especificado escreve\
                         um arquivo dot")
     parser.add_argument('--csv', action="store_true",
                         help="Saida stdout em CSV")
     parser.add_argument('-g', '--geracoes', metavar="Quantidade",
-                        action="store", default=5, type=int,
+                        action="store", default=2, type=int,
                         help="Especifica o numero de gerações igauis até\
                         desistir")
     parser.add_argument('-p', '--populacao', metavar="Quantidade",
-                        action="store", default=10, type=int,
+                        action="store", default=15, type=int,
                         help="Tamanho da populacão")
     parser.add_argument('-m', '--mutation-rate', metavar='Porcentagem',
                         action="store", default=20, type=int,
                         help="Porcentagem da probabilidade de ocorrer\
                         mutação")
     parser.add_argument('-s', '--step-size', metavar="Quantidade",
-                        action="store", type=int, default=100,
+                        action="store", type=int, default=10,
                         help="Tamanho do passo da saida")
-    parser.add_argument('INPUT', metavar="Arquivo de Entrada",
-                        action="store", type=file,
+    parser.add_argument('-i', '--input', metavar="Arquivo de Entrada",
+                        action="store", type=argparse.FileType('r'),
+                        default=sys.stdin,
                         help="Nome do arquivo de entrada, se não\
                         especificado será tomada a entrada STDIN")
+    parser.add_argument('--debug', action="store_true",
+                        help="Imprimi iterações")
     parsed = parser.parse_args(sys.argv[1:])
     genetico()
