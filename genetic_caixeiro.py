@@ -199,14 +199,14 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--csv', action="store", type=argparse.FileType('w'),
                         help="Saida em arquivo CSV")
     parser.add_argument('-g', '--geracoes-desiste', metavar="Quantidade",
-                        action="store", default=2, type=int,
+                        action="store", default=80, type=int,
                         help="Especifica o numero de gerações igauis até\
                         desistir")
     parser.add_argument('-p', '--populacao', metavar="Quantidade",
                         action="store", default=15, type=int,
                         help="Tamanho da populacão")
     parser.add_argument('-m', '--mutation-rate', metavar='Porcentagem',
-                        action="store", default=20, type=int,
+                        action="store", default=15, type=int,
                         help="Porcentagem da probabilidade de ocorrer\
                         mutação")
     parser.add_argument('-s', '--step-size', metavar="Quantidade",
