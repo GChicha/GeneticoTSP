@@ -168,6 +168,7 @@ def genetico():
         cp = vertices[:]
         shuffle(cp)
         populacao.append(filho(cp))
+    tam = len(populacao) // 3
     MelhorAnt = 0
     j = 0
     while True:
@@ -175,7 +176,8 @@ def genetico():
         populacao.sort(key=lambda x: x.custo)
         if not parsed.csv is None:
             grafico_out.writerow([i, populacao[0].custo])
-        populacao = populacao[0].crossover(populacao[1:5][randint(0, 3)])
+        pai2 = int((pow(random(), 8) % tam) + 1)
+        populacao = populacao[0].crossover(populacao[pai2])
         if i % parsed.step_size == 0 and parsed.debug:
             print ("Iteracao " + str(i) + " :" + str(populacao[0].custo))
         if MelhorAnt - populacao[0].custo == 0:
