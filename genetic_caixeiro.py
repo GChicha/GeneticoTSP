@@ -4,6 +4,7 @@
 from random import *
 from math import hypot
 import sys
+import csv
 import argparse
 custos = {}
 parsed = ()
@@ -148,6 +149,7 @@ def ler_mapa():
     vertices = []
     for i in range(num_vertices):
         linha = str(arqIn.readline())
+        linha = " ".join(linha.split())
         valores = linha.split(" ")
         vertices.append(vertice(
             cord1=float(valores[1]),
@@ -160,6 +162,8 @@ def genetico():
     vertices = ler_mapa()
     populacao = []
     i = 0
+    if not parsed.csv is None:
+        grafico_out = csv.writer(parsed.csv, delimiter=',')
     while len(populacao) < parsed.populacao:
         cp = vertices[:]
         shuffle(cp)
@@ -169,16 +173,18 @@ def genetico():
     while True:
         i += 1
         populacao.sort(key=lambda x: x.custo)
+        if not parsed.csv is None:
+            grafico_out.writerow([i, populacao[0].custo])
         populacao = populacao[0].crossover(populacao[1:5][randint(0, 3)])
         if i % parsed.step_size == 0 and parsed.debug:
             print ("Iteracao " + str(i) + " :" + str(populacao[0].custo))
-            if MelhorAnt - populacao[0].custo == 0:
-                j += 1
-                if j == parsed.geracoes:
-                    break
-            else:
-                j = 0
-                MelhorAnt = populacao[0].custo
+        if MelhorAnt - populacao[0].custo == 0:
+            j += 1
+            if j == parsed.geracoes_desiste:
+                break
+        else:
+            j = 0
+            MelhorAnt = populacao[0].custo
     if parsed.dot is not None:
         populacao[0].to_dot_file()
     print (str(populacao[0].custo))
@@ -190,9 +196,9 @@ if __name__ == '__main__':
                         action="store", type=argparse.FileType('w'),
                         help="Se especificado escreve\
                         um arquivo dot")
-    parser.add_argument('--csv', action="store_true",
-                        help="Saida stdout em CSV")
-    parser.add_argument('-g', '--geracoes', metavar="Quantidade",
+    parser.add_argument('-c', '--csv', action="store", type=argparse.FileType('w'),
+                        help="Saida em arquivo CSV")
+    parser.add_argument('-g', '--geracoes-desiste', metavar="Quantidade",
                         action="store", default=2, type=int,
                         help="Especifica o numero de gerações igauis até\
                         desistir")
