@@ -27,13 +27,12 @@ class filho(object):
                 break
 
     def mutation(self, chance):
-        for i in range(5):
-            if randint(chance - 100, chance) > 0:
-                x = randint(0, len(self.vertices)-1)
-                y = randint(0, len(self.vertices)-1)
-                temp = self.vertices[x]
-                self.vertices[x] = self.vertices[y]
-                self.vertices[y] = temp
+        if randint(chance - 100, chance) > 0:
+            x = randint(0, len(self.vertices)-1)
+            y = randint(0, len(self.vertices)-1)
+            temp = self.vertices[x]
+            self.vertices[x] = self.vertices[y]
+            self.vertices[y] = temp
 
     def __custo(self):
         global custos
@@ -164,10 +163,10 @@ def genetico():
     i = 0
     if not parsed.csv is None:
         grafico_out = csv.writer(parsed.csv, delimiter=',')
-    while len(populacao) < parsed.populacao:
-        cp = vertices[:]
-        shuffle(cp)
-        populacao.append(filho(cp))
+    populacao.append(filho(vertices))	 
+    cp = vertices[:]
+    shuffle(cp)
+    populacao.append(filho(cp))
     tam = len(populacao) // 3
     MelhorAnt = 0
     j = 0
@@ -176,7 +175,7 @@ def genetico():
         populacao.sort(key=lambda x: x.custo)
         if not parsed.csv is None:
             grafico_out.writerow([i, populacao[0].custo])
-        pai2 = int((pow(random(), 8) % tam) + 1)
+        pai2 = int((pow(random(), 8) % (tam+1)) + 1)
         populacao = populacao[0].crossover(populacao[pai2])
         if i % parsed.step_size == 0 and parsed.debug:
             print ("Iteracao " + str(i) + " :" + str(populacao[0].custo))
