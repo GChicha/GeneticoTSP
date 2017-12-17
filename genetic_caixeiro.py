@@ -10,12 +10,11 @@ custos = {}
 parsed = ()
 
 
-class filho(object):
+class filho:
     def __init__(self, vertices):
-        super(filho, self).__init__()
         self.vertices = vertices
         self.mutation(parsed.mutation_rate)
-        self.custo = self.__custo()
+        self.custo = custo(self.vertices)
         self.firstImprovement()
 
     def firstImprovement(self):
@@ -34,19 +33,10 @@ class filho(object):
             self.vertices[x] = self.vertices[y]
             self.vertices[y] = temp
 
-    def __custo(self):
-        global custos
-        custo = custos.get(tuple(self.vertices))
-        if custo is None:
-            custo = 0
-            for x in range(len(self.vertices)):
-                custo += self.vertices[x-1].distancia(self.vertices[x])
-            custos[tuple(self.vertices)] = custo
-        return custo
-
     def crossover(self, filho2):
         populacao = [self, filho2]
         tam = len(self.vertices)
+
         while len(populacao) < parsed.populacao:
             vertices = []
             inicio = randint(0, len(self.vertices))
@@ -89,33 +79,21 @@ class filho(object):
                 str(custo) + "\"];\n")
         f.write("}")
 
-
-class opt2(object):
-    """docstring for opt2."""
-    def __init__(self, vertices):
-        super(opt2, self).__init__()
-        self.vertices = vertices
-        self.i = 0
-        self.k = self.i + 1
-        self.tam = len(self.vertices)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.i > self.tam - 1:
-            raise StopIteration()
-        f = self.vertices[:self.i]
-        m = self.vertices[self.i:self.k]
+def opt2(vertices):
+    i = 0
+    k = i + 1
+    tam = len(vertices)
+    while i < tam -1:
+        f = vertices[:i]
+        m = vertices[i:k]
         m.reverse()
-        e = self.vertices[self.k:]
-        if self.k < self.tam - 1:
-            self.k = self.k + 1
+        e = vertices[k:]
+        if k < tam - 1:
+            k += 1
         else:
-            self.i = self.i + 1
-            self.k = self.i + 1
-        return f + m + e
-
+            i += 1
+            k = i + 1
+        yield f + m + e
 
 def custo(vertices):
     global custos
